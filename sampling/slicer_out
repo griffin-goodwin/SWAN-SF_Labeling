@@ -1,0 +1,48 @@
+('./new-data-folds/instances_O12L0P24/partition4/FL', './new-data-folds/instances_O12L0P24/partition4/NF')
+Processed 565 AR time series
+Filtered due to non-matched large flares 552
+Filtered due to low quality xray information 739
+Filtered due to excessive not-trusted magnetic field information 22695
+Filtered due to large flares in clear window 0
+Filtered due to non-verified flares 0
+	IOError Count: 0	Empty Data Error Count:0	Value Error Count: 0
+
+
+('./new-data-folds/instances_O12L0P24/partition3/FL', './new-data-folds/instances_O12L0P24/partition3/NF')
+Processed 474 AR time series
+Filtered due to non-matched large flares 801-552
+Filtered due to low quality xray information 972-739
+Filtered due to excessive not-trusted magnetic field information 41735-22695
+Filtered due to large flares in clear window 0
+Filtered due to non-verified flares 0
+	IOError Count: 0	Empty Data Error Count:0	Value Error Count: 0
+
+
+('./new-data-folds/instances_O12L0P24/partition1/FL', './new-data-folds/instances_O12L0P24/partition1/NF')
+Processed 805 AR time series
+Filtered due to non-matched large flares 1074-801
+Filtered due to low quality xray information 1126-972
+Filtered due to excessive not-trusted magnetic field information 75670-41735
+Filtered due to large flares in clear window 0
+Filtered due to non-verified flares 50
+	IOError Count: 0	Empty Data Error Count:0	Value Error Count: 0
+
+
+('./new-data-folds/instances_O12L0P24/partition2/FL', './new-data-folds/instances_O12L0P24/partition2/NF')
+Processed 1045 AR time series
+Filtered due to non-matched large flares 1276-1074
+Filtered due to low quality xray information 1337-1126
+Filtered due to excessive not-trusted magnetic field information 126282-75670
+Filtered due to large flares in clear window 0
+Filtered due to non-verified flares 50
+	IOError Count: 0	Empty Data Error Count:0	Value Error Count: 0
+
+
+('./new-data-folds/instances_O12L0P24/partition5/FL', './new-data-folds/instances_O12L0P24/partition5/NF')
+Processed 1209 AR time series
+Filtered due to non-matched large flares 1331-1276
+Filtered due to low quality xray information 1475-1337
+Filtered due to excessive not-trusted magnetic field information 195943-126282
+Filtered due to large flares in clear window 0
+Filtered due to non-verified flares 50
+	IOError Count: 0	Empty Data Error Count:0	Value Error Count: 0
