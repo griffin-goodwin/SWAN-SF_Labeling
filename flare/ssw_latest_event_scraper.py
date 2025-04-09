@@ -10,27 +10,46 @@ broken_flares = []
 
 
 def scrape(start, end):
-    ssw_base_url = "http://www.lmsal.com/solarsoft/latest_events_archive/events_summary/"
+    ssw_base_url = "https://www.lmsal.com/solarsoft/latest_events_archive.html"
     daterange = pd.date_range(start, end)
-    for single_date in daterange:
-        date_link_suffix = single_date.strftime("%Y/%m/%d/")
-        ssw_url = ssw_base_url + date_link_suffix
-        flr_url_list = fetch_daily_flare_links(ssw_url)
+    flr_url_list = fetch_daily_flare_links(ssw_base_url, daterange)
+    print(flr_url_list)
 
-        if len(flr_url_list) > 0:
-            print("Downloading " + str(len(flr_url_list)) + " flare items for the date " + date_link_suffix + " from URL:" + ssw_url)
-            scrape_flare_items(flr_url_list)
+    if len(flr_url_list) > 0:
+        print("Downloading " + str(len(flr_url_list)) + " flare items for the date " + date_link_suffix + " from URL:" + ssw_url)
+        scrape_flare_items(flr_url_list)
 
 
-def fetch_daily_flare_links(ssw_url):
+def fetch_daily_flare_links(ssw_url, date_range):
     try:
         with urllib.request.urlopen(ssw_url) as connection:
             dom = lxml.html.fromstring(connection.read())
 
+        # Extract all href links
+        all_links = dom.xpath('//a/@href')
+        # Filter links based on date range
+        filtered_links = []
+        for link in all_links:
+            try:
+            # Extract date from link format
+                if '/' in link and len(link.split('/')) > 2:
+                    date_part = link.split('/')[2].split('_')[2]
+                    dt = pd.to_datetime(date_part, format='%Y%m%d')
+                    if dt in date_range:
+                        filtered_links.append(link)
+            except (IndexError, ValueError):
+            # Skip links that don't match the expected format
+                pass
+        
+        print(f"Found {len(filtered_links)} links in date range")
         flr_url_list = []
-        for link in dom.xpath('//a/@href'):  # select the url in href for all a tags(links)
-            if str(link).startswith('gev'):
-                flr_url_list.append(ssw_url + link)
+        for link in filtered_links:
+            with urllib.request.urlopen("https://www.lmsal.com/solarsoft/"+str(link)) as connection:
+                sub_dom = lxml.html.fromstring(connection.read())
+                for sub_link in sub_dom.xpath('//a/@href'):
+                    if 'gev' in sub_link:
+                        # Create full URL by adding base URL if it's a relative link
+                        flr_url_list.append("https://www.lmsal.com/solarsoft/"+str(link).replace('index.html', '') + sub_link)
         return flr_url_list
 
     except URLError as urle:
@@ -137,11 +156,11 @@ def post_process_ssw_flares(ssw_fl):
 
 def main():
     start = '2010-01-01'
-    end = '2010-12-31'
+    end = '2010-01-31'
     scrape(start, end)
 
     ssw_fl = pd.DataFrame(flare_items)
-
+    print(ssw_fl)
     ssw_fl = post_process_ssw_flares(ssw_fl)
 
     # reorder columns for consistency

@@ -4,16 +4,16 @@ from datetime import datetime
 from urllib.error import HTTPError
 
 import pandas as pd
-import sunpy.instr.goes
+import sunkit_instruments.goes_xrs
 from dateutil.relativedelta import *
 from sunpy.net import hek
 from sunpy.time import TimeRange
 
-startdate = datetime(2015, 1, 1)
-enddate = datetime(2019, 1, 1)
+startdate = datetime(2010, 1, 1)
+enddate = datetime(2025, 1, 1)
 
 # DAY_DELTA = 20
-ofile_suffix = '_2015.csv'
+ofile_suffix = '_2025.csv'
 
 
 # def daterange(start_date, end_date):
@@ -42,14 +42,14 @@ def download_goes_flares(start_date, end_date, ofile):
         print('Downloading flares from ', tr.start, 'to', tr.end)
         temp = None
         try:
-            temp = (sunpy.instr.goes.get_goes_event_list(tr))
+            temp = (sunkit_instruments.goes_xrs.get_goes_event_list(tr))
         except HTTPError as http_error:
             max_tries = 1
             while True:
                 print(("There is an HTTP Error trying again after 5 seconds--", str(http_error)))
                 import time
                 time.sleep(5)
-                temp = (sunpy.instr.goes.get_goes_event_list(tr))
+                temp = (sunkit_instruments.goes_xrs.get_goes_event_list(tr))
 
                 if max_tries == 0:
                     sys.exit()
@@ -172,7 +172,7 @@ def download_fldet_flares(start_date, end_date, ofile):
 
 def run_main():
     start = time.time()
-    download_goes_flares(startdate, enddate, './datain/goesFlares_from' + ofile_suffix)
+    download_goes_flares(startdate, enddate, '/Users/griffingoodwin/Documents/gitrepos/armvtsprep/flare/flare_results' + ofile_suffix)
     end = time.time()
     print("Finished downloading GOES flares in: %.2f minutes." % ((end - start) / 60.0))
 
