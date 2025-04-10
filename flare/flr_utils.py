@@ -52,7 +52,7 @@ def get_hinode_flare_dataframe(file_path):
 
 def get_goes_flare_dataframe(file_path):
     """Reads the flare dataframe given in flare file path, downloaded using our script"""
-    df = pd.read_csv(file_path, delimiter=',', parse_dates=True)
+    df = pd.read_csv(file_path, delimiter='\t', parse_dates=True)
     df['end_time'] = fix_timestamps(df['end_time'], format='%Y-%m-%d %H:%M:%S')
     df['start_time'] = fix_timestamps(df['start_time'], format='%Y-%m-%d %H:%M:%S')
     df['peak_time'] = fix_timestamps(df['peak_time'], format='%Y-%m-%d %H:%M:%S')
@@ -221,7 +221,7 @@ def xcoord_transformer(x):
     lat = x['fl_lat']
     event_time = x['start_time']
     c = SkyCoord(lon*u.deg, lat*u.deg, frame=frames.HeliographicStonyhurst, obstime=event_time)
-    c_hpc = c.transform_to(frames.Helioprojective)
+    c_hpc = c.transform_to(frames.Helioprojective(observer='earth'))
     return c_hpc.Tx.arcsec #tx
 
 def ycoord_transformer(x):
@@ -229,6 +229,6 @@ def ycoord_transformer(x):
     lat = x['fl_lat']
     event_time = x['start_time']
     c = SkyCoord(lon*u.deg, lat*u.deg, frame=frames.HeliographicStonyhurst, obstime=event_time)
-    c_hpc = c.transform_to(frames.Helioprojective)
+    c_hpc = c.transform_to(frames.Helioprojective(observer='earth'))
     return c_hpc.Ty.arcsec #Ty
 

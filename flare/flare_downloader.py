@@ -62,7 +62,12 @@ def download_goes_flares(start_date, end_date, ofile):
         temp_start = tr.end.datetime
 
     print(('Length of total results: ', len(listofresults)))
-
+    print(listofresults)
+    # Convert any goes_location tuples to string representation
+    for flare in listofresults:
+        if isinstance(flare.get('goes_location', None), tuple):
+            flare['goes_location'] = str(flare['goes_location'])
+    
     df = pd.DataFrame(listofresults)
     df.to_csv(ofile, sep='\t', index=False)
 
@@ -172,7 +177,7 @@ def download_fldet_flares(start_date, end_date, ofile):
 
 def run_main():
     start = time.time()
-    download_goes_flares(startdate, enddate, '/Users/griffingoodwin/Documents/gitrepos/armvtsprep/flare/flare_results' + ofile_suffix)
+    download_goes_flares(startdate, enddate, 'goes_flares' + ofile_suffix)
     end = time.time()
     print("Finished downloading GOES flares in: %.2f minutes." % ((end - start) / 60.0))
 

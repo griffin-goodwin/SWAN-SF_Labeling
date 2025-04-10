@@ -157,20 +157,19 @@ def post_process_ssw_flares(ssw_fl):
 
 def main():
     start = '2010-01-01'
-    end = '2010-01-31'
+    end = '2010-01-02'
     scrape(start, end)
 
     ssw_fl = pd.DataFrame(flare_items)
-    print(ssw_fl)
     ssw_fl = post_process_ssw_flares(ssw_fl)
-
+    #ssw_fl.reset_index(drop=False, inplace=True)
     # reorder columns for consistency
-    ssw_fl = ssw_fl[['start_time', 'peak_time', 'end_time', 'goes_class', 'goes_location', 'noaa_active_region']]
-
+    #ssw_fl = ssw_fl[['EName','start_time', 'peak_time', 'end_time', 'goes_class', 'goes_location', 'noaa_active_region']]
+    #ssw_fl = ssw_fl.sort_values(by='start_time', ascending=True)
+    #ssw_fl.columns = ['id','start_time', 'peak_time', 'end_time', 'goes_class', 'goes_location', 'noaa_active_region']
     out_filename_1 = 'aia_ssw_flares_scraped_{}.csv'.format(start[0:4])
     out_filename_2 = 'broken_aia_flares_{}.csv'.format(start[0:4])
-    with open(out_filename_1, 'a') as f:  # write without a header, we can add later
-        ssw_fl.to_csv(f, header=False)
+    pd.DataFrame(ssw_fl).to_csv(out_filename_1)
 
     pd.DataFrame(broken_flares).to_csv(out_filename_2)
 
