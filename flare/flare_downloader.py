@@ -10,7 +10,7 @@ from sunpy.net import hek
 from sunpy.time import TimeRange
 
 startdate = datetime(2010, 1, 1)
-enddate = datetime(2025, 1, 1)
+enddate = datetime(2011, 1, 1)
 
 # DAY_DELTA = 20
 ofile_suffix = '_2025.csv'

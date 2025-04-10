@@ -16,7 +16,7 @@ def scrape(start, end):
     print(flr_url_list)
 
     if len(flr_url_list) > 0:
-        print("Downloading " + str(len(flr_url_list)) + " flare items for the date " + date_link_suffix + " from URL:" + ssw_url)
+        print("Downloading " + str(len(flr_url_list)))
         scrape_flare_items(flr_url_list)
 
 
@@ -109,7 +109,8 @@ def scrape_flare_items(flr_url_list):
                     broken_flares.append([theader, tcontent, fl_url])
         except urllib.error.HTTPError as http_e:
             print(http_e.code, ' for ', fl_url)
-
+        print(flare_items)
+        print('Flare items scraped: {}'.format(len(flare_items)))
 
 def fix_peak_time(ssw_fl):
     for index, row in ssw_fl.iterrows():
