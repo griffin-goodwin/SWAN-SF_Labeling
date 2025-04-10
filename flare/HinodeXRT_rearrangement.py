@@ -21,13 +21,15 @@ def fix_locations(hdf):
 
 def get_hinode_flare_dataframe(file_path, after=None, before=None):
     """Reads the flare dataframe given in flare file path, downloaded using our script"""
-    df = pd.read_csv(file_path, delimiter=',', index_col = 'Event number', parse_dates=True)
+    df = pd.read_csv(file_path, delimiter=',', index_col = 'id', parse_dates=True)
     
-    hinode_timeformat = '%Y/%m%d %H:%M'
-    df['end_time'] = fix_timestamps(df['end'], format='%Y-%m-%dT%H:%M:%S')
-    df['start_time'] = fix_timestamps(df['start'], format='%Y-%m-%dT%H:%M:%S')
-    df['peak_time'] = fix_timestamps(df['peak'], format='%Y-%m-%dT%H:%M:%S')
+    hinode_timeformat = '%Y/%m/%d %H:%M'
+    df['end_time'] = fix_timestamps(df['end'], format=hinode_timeformat)
+    df['start_time'] = fix_timestamps(df['start'], format=hinode_timeformat)
+    df['peak_time'] = fix_timestamps(df['peak'], format=hinode_timeformat)
     df = fix_locations(df)
+    df['goes_class'] = df['class'].str.strip()
+    df['noaa_active_region'] = pd.to_numeric(df['region'], errors='coerce')
     # df = append_hpc_coord(df)
     df.rename(columns={'X':'x_hpc', 'Y':'y_hpc'}, inplace=True)
     df = df[['start_time', 'peak_time', 'end_time', 'goes_class', 'noaa_active_region', 'ar_location', 'fl_lat', 'fl_lon', 'x_hpc', 'y_hpc']]
