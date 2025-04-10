@@ -65,15 +65,15 @@ def ycoord_transformer(x):
 
 
 def main():
-    hinode_path = '/home/baydin2/workspace/flarepredictiondata/flare_reading/datain/Hinode/xrt_flarecat.csv'
+    hinode_path = './xrt_flarecat.csv'
     # file obtained from https://xrt.cfa.harvard.edu/flare_catalog/xrt_flarecat.csv
     hdf = get_hinode_flare_dataframe(hinode_path)
     hdf2010_2018 = hdf[hdf['start_time'] > '2010-05-01']
 
-    hdf2010_2018.to_csv('/home/baydin2/workspace/flarepredictiondata/flare_reading/datain/Hinode/Hinode_fromXRT.csv',
+    hdf2010_2018.to_csv('./Hinode_fromXRT.csv',
                sep='\t')
 
-    hdf.to_csv('/home/baydin2/workspace/flarepredictiondata/flare_reading/datain/Hinode/Hinode_all_fromXRT.csv',
+    hdf.to_csv('./Hinode_all_fromXRT.csv',
                sep='\t')
 
 
