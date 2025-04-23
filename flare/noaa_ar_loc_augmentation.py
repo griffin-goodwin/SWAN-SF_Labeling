@@ -5,19 +5,20 @@ import numpy as np
 import pandas as pd
 import flr_utils as utils
 
-GOES_FLARE_PATH = './datain/GOES/goes_flares_052010_122018.csv'
-GOES_FLARE_OUTPUT_PATH = './datain/GOES/goes_flares_052010_122018_ar_hpc.csv'
-NOAA_AR_PATH = './datain/noaa_ars/MU_noaa_ars_plages.csv'
+GOES_FLARE_PATH = '/Users/fuzzb/OneDrive/Documents/armvtsprep/flare/goes_hpc.csv'
+GOES_FLARE_OUTPUT_PATH = '/Users/fuzzb/OneDrive/Documents/armvtsprep/flare/noaa_ar_hpc.csv'
+NOAA_AR_PATH = '/Users/fuzzb/OneDrive/Documents/armvtsprep/flare/solar_region_data.csv'
 
 def initialize():
 	noaa_ar = read_noaa_ars()
 	# print(noaa_ar)
 
 	goes_fl = get_flare_dataframe(GOES_FLARE_PATH)
-	# print(goes_fl)
+	#print(goes_fl)
 
 	centroids = get_ar_centroids(goes_fl, noaa_ar)
 	goes_fl['centroids'] = centroids
+	print(goes_fl.head(10))
 
 	goes_fl = fix_cent_locations(goes_fl)
 
@@ -33,12 +34,12 @@ def initialize():
 
 def read_noaa_ars():
 	noaa_ar = pd.read_csv(NOAA_AR_PATH)
-	noaa_ar = noaa_ar.rename(columns={'Unnamed: 0': 'id'})
-	noaa_ar = noaa_ar.set_index("id")
-	noaa_ar['year'] = noaa_ar['year'].astype(str)
-	noaa_ar['month'] = noaa_ar['month'].astype(str)
-	noaa_ar['day'] = noaa_ar['day'].astype(str)
-	noaa_ar['ar_time'] = pd.to_datetime(noaa_ar[['year', 'month', 'day']].apply(lambda x: '-'.join(x), axis=1))
+	#noaa_ar = noaa_ar.rename(columns={'Unnamed: 0': 'id'})
+	#noaa_ar = noaa_ar.set_index("id")
+	#noaa_ar['year'] = noaa_ar['year'].astype(str)
+	#noaa_ar['month'] = noaa_ar['month'].astype(str)
+	#noaa_ar['day'] = noaa_ar['day'].astype(str)
+	#noaa_ar['ar_time'] = pd.to_datetime(noaa_ar[['year', 'month', 'day']].apply(lambda x: '-'.join(x), axis=1))
 	return noaa_ar
 
 
@@ -83,17 +84,17 @@ def fix_cent_locations(df):
 
 def get_flare_dataframe(file_path):
 	"""Reads the goes flare dataframe given in flare file path, downloaded using our script"""
-	df = pd.read_csv(file_path, delimiter='\t',
+	df = pd.read_csv(file_path, delimiter=',',
 	                 parse_dates=['start_time', 'end_time', 'peak_time'])
 	new_columns = df.columns.values
 	new_columns[0] = 'flare_id'
 	df.columns = new_columns
 	df = df.set_index('flare_id')
-
 	# return fix_noaa_ar_numbers( pd.read_csv(file_path, delimiter='\t', parse_dates=True) )
-	df = fix_flare_locations(fix_noaa_ar_numbers(df))
+	#df = fix_flare_locations(fix_noaa_ar_numbers(df))
 	df = transform_fl_lat_lon(df)
 	# df = df[ df['goes_class'] > 'C9.9' ]
+
 	return df
 
 
@@ -140,12 +141,15 @@ def search_noaa(noaa_ar, noaa_no, peak_time):
 	elif noaa_no < 10000:
 		noaa_no += 10000
 
-	my_ar = noaa_ar[(noaa_ar['noaa_ar_no'] == noaa_no)]
+	print(noaa_ar)
+
+	my_ar = noaa_ar[(noaa_ar['region_number'] == noaa_no)]
 	if my_ar.shape[0] == 0:
 		if noaa_no == noaa_no:
 			print('There are no AR from NOAA for \#', noaa_no)
 		return {}
 	else:
+		print('Found AR \#', noaa_no, 'for time', peak_time)
 		my_ar['diff'] = my_ar["ar_time"] - peak_time
 		closest = my_ar[np.abs(my_ar['diff']) == np.abs(my_ar['diff']).min()]
 		closest = closest[np.abs(closest['diff'].values) < np.timedelta64(72, 'h')]
