@@ -4,43 +4,47 @@ from os.path import isfile, isdir, join
 import numpy as np
 import pandas as pd
 import flr_utils as utils
+import re
 
-GOES_FLARE_PATH = '/Users/fuzzb/OneDrive/Documents/armvtsprep/flare/goes_hpc.csv'
-GOES_FLARE_OUTPUT_PATH = '/Users/fuzzb/OneDrive/Documents/armvtsprep/flare/noaa_ar_hpc.csv'
-NOAA_AR_PATH = '/Users/fuzzb/OneDrive/Documents/armvtsprep/flare/solar_region_data.csv'
+GOES_FLARE_PATH = './goes_hpc.csv'
+GOES_FLARE_OUTPUT_PATH = './noaa_ar_hpc.csv'
+NOAA_AR_PATH = './solar_region_data.csv'
 
 def initialize():
-	noaa_ar = read_noaa_ars()
-	# print(noaa_ar)
+	#noaa_ar = read_noaa_ars()
+	noaa_ar = pd.read_csv(NOAA_AR_PATH)
+	#print(noaa_ar)
 
 	goes_fl = get_flare_dataframe(GOES_FLARE_PATH)
 	#print(goes_fl)
 
 	centroids = get_ar_centroids(goes_fl, noaa_ar)
 	goes_fl['centroids'] = centroids
-	print(goes_fl.head(10))
+
+	#print(goes_fl[goes_fl['centroids'].notnull()])
 
 	goes_fl = fix_cent_locations(goes_fl)
 
-	print(goes_fl.head(10))
+	
 
 	goes_fl = utils.append_hpc_coord(goes_fl)
+	print(goes_fl[goes_fl['centroids'].notnull()])
 	goes_fl = transform_fl_lat_lon(goes_fl)
 
-	print(goes_fl.head(10))
+	#print(goes_fl.head(10))
 
 	goes_fl.to_csv(GOES_FLARE_OUTPUT_PATH)
 
 
-def read_noaa_ars():
-	noaa_ar = pd.read_csv(NOAA_AR_PATH)
+#def read_noaa_ars():
+	# noaa_ar = pd.read_csv(NOAA_AR_PATH)
 	#noaa_ar = noaa_ar.rename(columns={'Unnamed: 0': 'id'})
 	#noaa_ar = noaa_ar.set_index("id")
 	#noaa_ar['year'] = noaa_ar['year'].astype(str)
 	#noaa_ar['month'] = noaa_ar['month'].astype(str)
 	#noaa_ar['day'] = noaa_ar['day'].astype(str)
 	#noaa_ar['ar_time'] = pd.to_datetime(noaa_ar[['year', 'month', 'day']].apply(lambda x: '-'.join(x), axis=1))
-	return noaa_ar
+	#return noaa_ar
 
 
 def transform_fl_lat_lon(fdf):
@@ -141,8 +145,8 @@ def search_noaa(noaa_ar, noaa_no, peak_time):
 	# elif noaa_no < 10000:
 	# 	noaa_no += 10000
 
-	print(noaa_ar)
-	print(noaa_no)
+	#print(noaa_ar)
+	#print(noaa_no)
 	my_ar = noaa_ar[(noaa_ar['region_number'] == noaa_no)]
 	if my_ar.shape[0] == 0:
 		if noaa_no == noaa_no:
@@ -150,7 +154,10 @@ def search_noaa(noaa_ar, noaa_no, peak_time):
 		return {}
 	else:
 		print('Found AR \#', noaa_no, 'for time', peak_time)
-		my_ar['diff'] = my_ar["ar_time"] - peak_time
+		#print(my_ar['date'])
+		#print(peak_time)
+		my_ar['date'] = pd.to_datetime(my_ar['date'])
+		my_ar['diff'] = my_ar["date"] - peak_time
 		closest = my_ar[np.abs(my_ar['diff']) == np.abs(my_ar['diff']).min()]
 		closest = closest[np.abs(closest['diff'].values) < np.timedelta64(72, 'h')]
 		if closest.shape[0] == 1:
@@ -195,7 +202,7 @@ def find_noaa_centroid(noaa_ar, ar_no, t, fl_x, fl_y):
 	Based on a given noaa_ar number and a time, find the interpolated noaa ar location.
 	If location (specifically longitude is greater than 90 or less than -90, fix them to 90 degrees.
 	:param noaa_ar: Data frame for noaa ar's
-	:param ar_no: Noaa active region number
+	:param ar_no: Noaa active region number from flare data
 	:param t: time of the flare (for interpolation)
 	:param fl_x: not used
 	:param fl_y: not used
@@ -204,9 +211,21 @@ def find_noaa_centroid(noaa_ar, ar_no, t, fl_x, fl_y):
 	ar_record = search_noaa(noaa_ar, ar_no, t)
 	#     print ar_record
 	if (len(ar_record)) == 1:
-		ar_lat = ar_record[0]['latitude']
-		ar_lon = ar_record[0]['central_meridian_dist']
-
+		# Extract latitude and longitude from the 'location' column (format: N/S..E/W)
+		loc_str = ar_record[0]['location']
+		if isinstance(loc_str, str):
+			match = re.match(r'([NS])(\d+)([EW])(\d+)', loc_str)
+			if match:
+				lat_dir, lat_val, lon_dir, lon_val = match.groups()
+				ar_lat = float(lat_val) * (1 if lat_dir == 'N' else -1)
+				ar_lon = float(lon_val) * (1 if lon_dir == 'E' else -1)
+			else:
+				ar_lat = np.nan
+				ar_lon = np.nan
+			# ar_record[0]['latitude'] = lat
+			# ar_record[0]['central_meridian_dist'] = lon
+		#ar_lat = ar_record[0]['latitude']
+		#ar_lon = ar_record[0]['central_meridian_dist']
 		t_diff_day = ar_record[0]['diff'] / pd.Timedelta('1 day')
 		#         print t_diff_day
 		new_ar_lon = ar_lon + calculate_lon_delta(ar_lat, -t_diff_day)
@@ -214,13 +233,15 @@ def find_noaa_centroid(noaa_ar, ar_no, t, fl_x, fl_y):
 			new_ar_lon = 90
 		elif new_ar_lon < -90:
 			new_ar_lon = -90
-
+		print('new ar lon', new_ar_lon)
+		print('ar lat', ar_lat)
 		return '(' + str(new_ar_lon) + ', ' + str(ar_lat) + ')'
 	else:
 		return np.nan
 
 
 def get_ar_centroids(fdf, noaa_ar):
+	#Going through each flare and comparing to noaa ar data
 	return fdf.apply(
 		lambda row: find_noaa_centroid(noaa_ar, row['noaa_active_region'], row['peak_time'], row['x'], row['y']),
 		axis=1)
