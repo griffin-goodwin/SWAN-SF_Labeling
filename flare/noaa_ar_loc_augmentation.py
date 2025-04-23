@@ -136,13 +136,13 @@ def fix_noaa_ar_numbers(df):
 
 def search_noaa(noaa_ar, noaa_no, peak_time):
 	#     print noaa_no
-	if noaa_no == 0:
-		return {}
-	elif noaa_no < 10000:
-		noaa_no += 10000
+	# if noaa_no == 0:
+	# 	return {}
+	# elif noaa_no < 10000:
+	# 	noaa_no += 10000
 
 	print(noaa_ar)
-
+	print(noaa_no)
 	my_ar = noaa_ar[(noaa_ar['region_number'] == noaa_no)]
 	if my_ar.shape[0] == 0:
 		if noaa_no == noaa_no:
