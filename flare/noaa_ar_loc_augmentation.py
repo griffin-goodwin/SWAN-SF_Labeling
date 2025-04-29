@@ -6,9 +6,9 @@ import pandas as pd
 import flr_utils as utils
 import re
 
-GOES_FLARE_PATH = './goes_hpc.csv'
-GOES_FLARE_OUTPUT_PATH = './noaa_ar_hpc.csv'
-NOAA_AR_PATH = './solar_region_data.csv'
+GOES_FLARE_PATH = '/Users/griffingoodwin/Documents/gitrepos/armvtsprep/flare/goes_hpc.csv'
+GOES_FLARE_OUTPUT_PATH = '/Users/griffingoodwin/Documents/gitrepos/armvtsprep/flare/noaa_ar_hpc.csv'
+NOAA_AR_PATH = '/Users/griffingoodwin/Documents/gitrepos/armvtsprep/flare/solar_region_data.csv'
 
 def initialize():
 	#noaa_ar = read_noaa_ars()

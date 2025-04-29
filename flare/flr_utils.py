@@ -43,7 +43,7 @@ def get_ssw_flare_dataframe(file_path):
 
 def get_hinode_flare_dataframe(file_path):
     """Reads the flare dataframe given in flare file path, downloaded using our script"""
-    df = pd.read_csv(file_path, delimiter=',', index_col='Event_number', parse_dates=True)
+    df = pd.read_csv(file_path, delimiter='\t', index_col='id', parse_dates=True)
     df['end_time'] = fix_timestamps(df['end_time'], format='%Y-%m-%d %H:%M:%S')
     df['start_time'] = fix_timestamps(df['start_time'], format='%Y-%m-%d %H:%M:%S')
     df['peak_time'] = fix_timestamps(df['peak_time'], format='%Y-%m-%d %H:%M:%S')
@@ -52,7 +52,7 @@ def get_hinode_flare_dataframe(file_path):
 
 def get_goes_flare_dataframe(file_path):
     """Reads the flare dataframe given in flare file path, downloaded using our script"""
-    df = pd.read_csv(file_path, delimiter='\t', parse_dates=True)
+    df = pd.read_csv(file_path, delimiter=',', parse_dates=True)
     df['end_time'] = fix_timestamps(df['end_time'], format='%Y-%m-%d %H:%M:%S')
     df['start_time'] = fix_timestamps(df['start_time'], format='%Y-%m-%d %H:%M:%S')
     df['peak_time'] = fix_timestamps(df['peak_time'], format='%Y-%m-%d %H:%M:%S')

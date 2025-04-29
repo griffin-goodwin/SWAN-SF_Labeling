@@ -31,7 +31,7 @@ def prepare_ssw_flares():
 	sswf = utils.fix_ssw_flare_locations(sswf)
 	print(sswf)
 	sswf = utils.append_hpc_coord(sswf)
-	sswf.to_csv("ssw_hpc2.csv")
+	sswf.to_csv("ssw_hpc.csv")
 
 
 def main():

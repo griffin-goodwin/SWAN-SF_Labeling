@@ -6,9 +6,9 @@ import pandas as pd
 import flr_utils as utils
 
 
-SSW_FLARE_PATH = './datain/SSW/ssw_hpc.csv'
-HINODE_FLARE_PATH = './datain/Hinode/Hinode_fromXRT.csv'
-GOES_FLARE_PATH = './datain/GOES/goes_flares_052010_122018_ar_hpc.csv'
+SSW_FLARE_PATH = '/Users/griffingoodwin/Documents/gitrepos/armvtsprep/flare/ssw_hpc2.csv'
+HINODE_FLARE_PATH = '/Users/griffingoodwin/Documents/gitrepos/armvtsprep/flare/Hinode_fromXRT.csv'
+GOES_FLARE_PATH = '/Users/griffingoodwin/Documents/gitrepos/armvtsprep/flare/goes_hpc.csv'
 
 
 # NO_LOC_FL_PATH = './datain/goes_fl_no_loc.csv'
@@ -192,7 +192,7 @@ from sunpy.coordinates import frames
 
 def HPC_to_HGS(x_hpc, y_hpc, event_time):
 #     event_time = x['start_time']
-    c = SkyCoord(x_hpc*u.arcsec, y_hpc*u.arcsec, frame=frames.Helioprojective, obstime=event_time)
+    c = SkyCoord(x_hpc*u.arcsec, y_hpc*u.arcsec, frame=frames.Helioprojective, obstime=event_time, observer='earth')
     c_hgs = c.transform_to(frames.HeliographicStonyhurst)
     return c_hgs.lon.degree, c_hgs.lat.degree
 

@@ -1,8 +1,8 @@
 #!/bin/bash
 
 #Scrape SSW reports
-# echo Scraping SSW flare reports...
-# python ssw_latest_event_scraper.py
+echo Scraping SSW flare reports...
+python ssw_latest_event_scraper.py
 
 echo Pre-processing scraped SSW flare reports...
 python ssw_goes_preprocess.py
